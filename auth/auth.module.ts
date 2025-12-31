@@ -1,0 +1,24 @@
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { CustomersModule } from '../customers/customers.module';
+
+@Module({
+  imports: [
+    ConfigModule,
+    CustomersModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (cfg: ConfigService) => ({
+        secret: cfg.get<string>('JWT_SECRET') || 'changeme',
+        signOptions: { expiresIn: '7d' }
+      })
+    })
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService, JwtModule]
+})
+export class AuthModule {}
