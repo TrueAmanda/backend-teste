@@ -50,6 +50,29 @@ export class OrdersService {
       valorTotalBRL: valorTotalBRLRounded,
     } as unknown as Partial<Order>);
 
+    // Buscar dados do cliente para notificação
+    let customerData = { name: 'Cliente', email: 'cliente@exemplo.com' };
+    if (clienteId) {
+      try {
+        const customer = await this.customers.findOne((clienteId as Types.ObjectId).toString());
+        if (customer) {
+          customerData = {
+            name: customer.nome,
+            email: customer.email
+          };
+        }
+      } catch (error) {
+        this.logger.warn('Could not fetch customer data for notification', error);
+      }
+    }
+
+    // Adicionar job de notificação por e-mail
+    await this.queue.addNotification({
+      orderId: created._id.toString(),
+      customerName: customerData.name,
+      customerEmail: customerData.email
+    });
+
     // enqueue receipt generation (async background job)
     this.queue.addGenerateReceipt({ orderId: created._id.toString() });
 
@@ -92,5 +115,11 @@ export class OrdersService {
       
     if (!updated) throw new NotFoundException('Order not found');
     return updated;
+  }
+
+  async remove(id: string) {
+    const deleted = await this.model.findByIdAndDelete(id).exec();
+    if (!deleted) throw new NotFoundException('Order not found');
+    return { deleted: true };
   }
 }

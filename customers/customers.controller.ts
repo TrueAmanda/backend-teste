@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -23,8 +23,11 @@ export class CustomersController {
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Número da página' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Itens por página' })
   @ApiResponse({ status: 200, description: 'Lista de clientes retornada com sucesso' })
-  list() {
-    return this.svc.findAll();
+  list(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10'
+  ) {
+    return this.svc.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')

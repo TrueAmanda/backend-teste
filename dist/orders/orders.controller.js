@@ -69,15 +69,11 @@ let OrdersController = OrdersController_1 = class OrdersController {
             throw new common_1.InternalServerErrorException('Falha ao fazer upload do comprovante');
         }
     }
-    async generateReceipt(id) {
-        try {
-            const url = await this.receiptSvc.generateAndUpload(id);
-            return { receiptUrl: url };
-        }
-        catch (err) {
-            console.error('Generate receipt error', err);
-            throw new (require('@nestjs/common').InternalServerErrorException)('Failed to generate receipt');
-        }
+    async update(id, updateData) {
+        return this.svc.update(id, updateData);
+    }
+    async remove(id) {
+        return this.svc.remove(id);
     }
 };
 __decorate([
@@ -212,16 +208,28 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "uploadReceipt", null);
 __decorate([
-    (0, common_1.Post)(':id/generate-receipt'),
-    (0, swagger_1.ApiOperation)({ summary: 'Gera o recibo em PDF do pedido e faz upload para o S3/armazenamento local' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Recibo gerado com sucesso' }),
+    (0, common_1.Put)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Atualiza um pedido existente' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Pedido atualizado com sucesso' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Pedido não encontrado' }),
-    (0, swagger_1.ApiResponse)({ status: 500, description: 'Erro ao gerar o recibo' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Dados inválidos' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Remove um pedido' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Pedido removido com sucesso' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Pedido não encontrado' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'ID inválido' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], OrdersController.prototype, "generateReceipt", null);
+], OrdersController.prototype, "remove", null);
 OrdersController = OrdersController_1 = __decorate([
     (0, swagger_1.ApiTags)('orders'),
     (0, swagger_1.ApiBearerAuth)('access-token'),

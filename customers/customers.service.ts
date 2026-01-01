@@ -13,8 +13,13 @@ export class CustomersService {
     return this.model.create(dto);
   }
 
-  findAll() {
-    return this.model.find().exec();
+  findAll(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    return this.model
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   async findOne(id: string) {

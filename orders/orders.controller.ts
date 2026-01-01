@@ -200,18 +200,21 @@ export class OrdersController {
     }
   }
 
-  @Post(':id/generate-receipt')
-  @ApiOperation({ summary: 'Gera o recibo em PDF do pedido e faz upload para o S3/armazenamento local' })
-  @ApiResponse({ status: 201, description: 'Recibo gerado com sucesso' })
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualiza um pedido existente' })
+  @ApiResponse({ status: 200, description: 'Pedido atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Pedido não encontrado' })
-  @ApiResponse({ status: 500, description: 'Erro ao gerar o recibo' })
-  async generateReceipt(@Param('id') id: string) {
-    try {
-      const url = await this.receiptSvc.generateAndUpload(id);
-      return { receiptUrl: url };
-    } catch (err) {
-      console.error('Generate receipt error', err);
-      throw new (require('@nestjs/common').InternalServerErrorException)('Failed to generate receipt');
-    }
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  async update(@Param('id') id: string, @Body() updateData: any) {
+    return this.svc.update(id, updateData);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remove um pedido' })
+  @ApiResponse({ status: 200, description: 'Pedido removido com sucesso' })
+  @ApiResponse({ status: 404, description: 'Pedido não encontrado' })
+  @ApiResponse({ status: 400, description: 'ID inválido' })
+  async remove(@Param('id') id: string) {
+    return this.svc.remove(id);
   }
 }

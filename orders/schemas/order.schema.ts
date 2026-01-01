@@ -3,12 +3,6 @@ import { Document, Types } from 'mongoose';
 
 export type OrderDocument = Order & Document;
 
-class Item {
-  produto: string;
-  quantidade: number;
-  precoUnitarioUSD: number;
-}
-
 @Schema({ timestamps: { createdAt: true, updatedAt: false } })
 export class Order {
   @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
@@ -18,7 +12,11 @@ export class Order {
   data: Date;
 
   @Prop({ type: [{ produto: String, quantidade: Number, precoUnitarioUSD: Number }], default: [] })
-  itens: Item[];
+  itens: {
+    produto: string;
+    quantidade: number;
+    precoUnitarioUSD: number;
+  }[];
 
   @Prop()
   valorTotalUSD: number;

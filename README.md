@@ -91,7 +91,9 @@ npm run build
 - `GET /orders` - Listar pedidos
 - `POST /orders` - Criar pedido (requer autenticação)
 - `GET /orders/:id` - Buscar pedido
-- `POST /orders/:id/generate-receipt` - Gerar PDF
+- `PUT /orders/:id` - Atualizar pedido
+- `DELETE /orders/:id` - Remover pedido
+- `POST /orders/:id/comprovante` - Upload de comprovante (requer autenticação)
 
 ### Relatórios
 - `GET /relatorios/top-clientes` - Top clientes
@@ -104,7 +106,7 @@ npm run build
 # Banco de dados
 MONGO_URI=mongodb://localhost:27017/nextbuy
 
-# Redis
+# Redis (obrigatório para processamento assíncrono)
 REDIS_URL=redis://localhost:6379
 
 # JWT

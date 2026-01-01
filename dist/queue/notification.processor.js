@@ -39,6 +39,9 @@ let NotificationProcessor = NotificationProcessor_1 = class NotificationProcesso
         jobLogger.debug(`Processing job ${job.id} (${job.name})`);
         try {
             switch (job.name) {
+                case 'send-email':
+                    await this.handleSendEmail(job);
+                    break;
                 case 'generate-receipt':
                     await this.handleGenerateReceipt(job);
                     break;
@@ -55,6 +58,29 @@ let NotificationProcessor = NotificationProcessor_1 = class NotificationProcesso
             jobLogger.error(`Job ${job.id} failed after ${this.maxRetries} attempts`);
             throw error;
         }
+    }
+    async handleSendEmail(job) {
+        const { orderId, customerName, customerEmail } = job.data;
+        if (!orderId || !customerName || !customerEmail) {
+            throw new Error('Dados do pedido ou cliente não fornecidos');
+        }
+        this.logger.log(`📧 Enviando e-mail de confirmação para o pedido ${orderId}`);
+        this.logger.log(`👤 Cliente: ${customerName} (${customerEmail})`);
+        this.logger.log(`📦 Pedido ID: ${orderId}`);
+        this.logger.log(`✅ E-mail de confirmação enviado com sucesso!`);
+        // Simulação de envio de e-mail
+        console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║                    CONFIRMAÇÃO DE PEDIDO                    ║
+╠══════════════════════════════════════════════════════════════╣
+║ Cliente: ${customerName.padEnd(50)} ║
+║ E-mail: ${customerEmail.padEnd(49)} ║
+║ Pedido:  ${orderId.padEnd(49)} ║
+║                                                              ║
+║ Seu pedido foi recebido e está sendo processado!           ║
+║ Agradecemos sua compra.                                      ║
+╚══════════════════════════════════════════════════════════════╝
+    `);
     }
     async handleGenerateReceipt(job) {
         const { orderId } = job.data;
@@ -73,12 +99,10 @@ let NotificationProcessor = NotificationProcessor_1 = class NotificationProcesso
     }
     getConnection() {
         const url = this.cfg.get('REDIS_URL');
-        if (url)
-            return { url };
-        return {
-            host: this.cfg.get('REDIS_HOST') || '127.0.0.1',
-            port: Number(this.cfg.get('REDIS_PORT') || 6379)
-        };
+        if (!url) {
+            throw new Error('REDIS_URL é obrigatório para o processamento assíncrono');
+        }
+        return { url };
     }
     async onModuleDestroy() {
         var _a;

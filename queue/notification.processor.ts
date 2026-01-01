@@ -43,6 +43,10 @@ export class NotificationProcessor implements OnModuleDestroy {
 
     try {
       switch (job.name) {
+        case 'send-email':
+          await this.handleSendEmail(job);
+          break;
+          
         case 'generate-receipt':
           await this.handleGenerateReceipt(job);
           break;
@@ -61,6 +65,33 @@ export class NotificationProcessor implements OnModuleDestroy {
       jobLogger.error(`Job ${job.id} failed after ${this.maxRetries} attempts`);
       throw error;
     }
+  }
+
+  private async handleSendEmail(job: Job) {
+    const { orderId, customerName, customerEmail } = job.data;
+    
+    if (!orderId || !customerName || !customerEmail) {
+      throw new Error('Dados do pedido ou cliente não fornecidos');
+    }
+
+    this.logger.log(`📧 Enviando e-mail de confirmação para o pedido ${orderId}`);
+    this.logger.log(`👤 Cliente: ${customerName} (${customerEmail})`);
+    this.logger.log(`📦 Pedido ID: ${orderId}`);
+    this.logger.log(`✅ E-mail de confirmação enviado com sucesso!`);
+    
+    // Simulação de envio de e-mail
+    console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║                    CONFIRMAÇÃO DE PEDIDO                    ║
+╠══════════════════════════════════════════════════════════════╣
+║ Cliente: ${customerName.padEnd(50)} ║
+║ E-mail: ${customerEmail.padEnd(49)} ║
+║ Pedido:  ${orderId.padEnd(49)} ║
+║                                                              ║
+║ Seu pedido foi recebido e está sendo processado!           ║
+║ Agradecemos sua compra.                                      ║
+╚══════════════════════════════════════════════════════════════╝
+    `);
   }
 
   private async handleGenerateReceipt(job: Job) {
@@ -83,11 +114,10 @@ export class NotificationProcessor implements OnModuleDestroy {
 
   private getConnection() {
     const url = this.cfg.get<string>('REDIS_URL');
-    if (url) return { url } as any;
-    return {
-      host: this.cfg.get<string>('REDIS_HOST') || '127.0.0.1',
-      port: Number(this.cfg.get<number>('REDIS_PORT') || 6379)
-    } as any;
+    if (!url) {
+      throw new Error('REDIS_URL é obrigatório para o processamento assíncrono');
+    }
+    return { url } as any;
   }
 
   async onModuleDestroy() {

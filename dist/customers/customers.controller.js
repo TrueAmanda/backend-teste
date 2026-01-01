@@ -25,8 +25,8 @@ let CustomersController = class CustomersController {
     create(dto) {
         return this.svc.create(dto);
     }
-    list() {
-        return this.svc.findAll();
+    list(page = '1', limit = '10') {
+        return this.svc.findAll(Number(page), Number(limit));
     }
     get(id) {
         return this.svc.findOne(id);
@@ -54,8 +54,10 @@ __decorate([
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Número da página' }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Itens por página' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de clientes retornada com sucesso' }),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "list", null);
 __decorate([
